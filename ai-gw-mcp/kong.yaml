@@ -1,0 +1,14 @@
+_format_version: "3.0"
+
+services:
+  - name: mcp-dice-roller
+    url: http://mcp-dice-roller:3001/mcp
+    routes:
+      - name: mcp-dice-roller
+        paths:
+          - /mcp/dice
+    plugins:
+      - name: ai-mcp-proxy
+        config:
+          mode: passthrough-listener
+          max_request_body_size: 1048576

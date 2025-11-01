@@ -1,0 +1,5 @@
+*DS_Store*
+**/*.env
+**/certs/tls.crt
+**/certs/tls.key
+**/.idea/
