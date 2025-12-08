@@ -1,0 +1,67 @@
+version: "3"
+
+tasks:
+  install:
+    cmds:
+      - task: init
+      - task: create-secrets
+      - task: install-pg
+      - task: install-cp
+      - task: install-dp
+      - task: deploy-upstream
+      - task: gen-deck-config
+
+  init:
+    desc: "Setup Helm repos and namespace"
+    cmds:
+      - helm repo add kong https://charts.konghq.com
+      - helm repo update
+      - kubectl create namespace kong --dry-run=client -o yaml | kubectl apply -f -
+
+  create-secrets:
+    desc: "Create Kubernetes secrets for license and PKI"
+    cmds:
+      - kubectl create secret generic kong-enterprise-license --from-file=license=${HOME}/.kong-license-data/license.json -n kong --dry-run=client -o yaml | kubectl apply -f -
+      - kubectl create secret tls kong-cluster --cert=certs/kong_clustering.crt --key=certs/kong_clustering.key -n kong
+      - kubectl create secret generic kong-cluster-ca --from-file=tls.crt=certs/kong_clustering_ca.crt -n kong
+      - kubectl create secret generic kong-dp-cert --from-file=dp.crt=certs/kong_clustering_client.crt --from-file=dp.key=certs/kong_clustering_client.key --from-file=ca.crt=certs/kong_clustering_ca.crt -n kong
+      - kubectl create secret tls httpbin-tls --cert=certs/httpbin.crt --key=certs/httpbin.key -n kong
+
+  install-pg:
+    cmds:
+      - helm repo add cnpg https://cloudnative-pg.github.io/charts
+      - helm upgrade --install cnpg -n cnpg --create-namespace cnpg/cloudnative-pg
+      - kubectl wait --for=condition=Available deployment/cnpg-cloudnative-pg -n cnpg --timeout=120s
+      - kubectl apply -f values-pg.yaml
+      - kubectl wait --for=condition=Ready cluster.postgresql.cnpg.io/kong-cp-db -n kong --timeout=300s
+
+  install-cp:
+    desc: "Deploy Control Plane with PKI mTLS"
+    cmds:
+      - helm upgrade --install kong-cp kong/kong -n kong --values values-cp.yaml --set image.tag=${KONG_TAG:-3.12}
+      - kubectl wait deployment/kong-cp-kong --for=condition=available --timeout=300s -n kong
+
+  install-dp:
+    desc: "Deploy Data Plane with PKI mTLS"
+    cmds:
+      - helm upgrade --install kong-dp kong/kong -n kong --values values-dp.yaml --set image.tag=${KONG_TAG:-3.12}
+      - kubectl wait deployment/kong-dp-kong --for=condition=available --timeout=300s -n kong
+
+  deploy-upstream:
+    desc: "Deploy TLS httpbin upstream"
+    cmds:
+      - kubectl apply -f values-httpbin.yaml
+
+  gen-deck-config:
+    desc: "Generate kong.yaml with embedded CA cert"
+    cmds:
+      - |
+        CA_UUID=$(uuidgen | awk '{print tolower($0)}') \
+        yq '.ca_certificates[0].id = strenv(CA_UUID) |
+        .ca_certificates[0].cert = load_str("./certs/kong_clustering_ca.crt") |
+        .services[0].ca_certificates[0] = strenv(CA_UUID)' \
+        kong/base.yaml > kong/kong.yaml
+
+  clean:
+    cmds:
+      - kubectl delete namespace kong

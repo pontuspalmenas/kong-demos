@@ -1,0 +1,13 @@
+_format_version: "3.0"
+
+services:
+  - name: httpbin
+    url: https://httpbin.kong.svc.cluster.local:8443
+    tls_verify: true
+    tls_verify_depth: 3
+    ca_certificates:
+      - id
+    routes:
+      - name: httpbin
+        paths:
+          - /httpbin

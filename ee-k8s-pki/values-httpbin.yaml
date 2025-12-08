@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpbin
+  namespace: kong
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpbin
+  template:
+    metadata:
+      labels:
+        app: httpbin
+    spec:
+      containers:
+      - name: httpbin
+        image: kennethreitz/httpbin
+        ports:
+        - containerPort: 8443
+        volumeMounts:
+        - name: tls
+          mountPath: /certs
+          readOnly: true
+        command:
+          - sh
+          - -c
+          - >
+            gunicorn -b 0.0.0.0:8443 --certfile=/certs/tls.crt --keyfile=/certs/tls.key httpbin:app
+      volumes:
+      - name: tls
+        secret:
+          secretName: httpbin-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpbin
+  namespace: kong
+spec:
+  selector:
+    app: httpbin
+  ports:
+    - name: https
+      port: 8443
+      targetPort: 8443
