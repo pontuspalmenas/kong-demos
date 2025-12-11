@@ -1,5 +1,17 @@
 _format_version: "3.0"
 
+plugins:  
+  - name: prometheus
+    enabled: true
+    config:
+      upstream_health_metrics: true
+      per_consumer: false
+      bandwidth_metrics: true
+      status_code_metrics: true
+      wasm_metrics: false
+      latency_metrics: true
+      ai_metrics: false
+
 services:
   - name: httpbin
     url: https://httpbin.kong.svc.cluster.local:8443
@@ -11,19 +23,3 @@ services:
       - name: httpbin
         paths:
           - /httpbin
-plugins:
-  enabled: true
-  name: prometheus
-  config:
-    upstream_health_metrics: true
-    per_consumer: false
-    bandwidth_metrics: true
-    status_code_metrics: true
-    wasm_metrics: false
-    latency_metrics: true
-    ai_metrics: false
-  protocols:
-    - grpc
-    - grpcs
-    - http
-    - https
