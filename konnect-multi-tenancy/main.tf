@@ -21,7 +21,7 @@ locals {
 resource "konnect_gateway_control_plane" "cp" {
   for_each = toset(local.environments)
 
-  name         = "cp-${local.project}-${each.key}-${var.region}"
+  name         = "${local.project}-${each.key}-${var.region}"
   description  = "Control Plane for ${local.project} in ${each.key} environment"
   labels = {
     env:"${each.key}"
@@ -34,7 +34,7 @@ resource "konnect_gateway_control_plane" "cp" {
 resource "konnect_team" "admin_team" {
   for_each = toset(local.environments)
 
-  name        = "team-${local.project}-${each.key}-admin"
+  name        = "${local.project}-${each.key}-admin"
   description = "Admin access for ${each.key} control plane"
 }
 
@@ -42,7 +42,7 @@ resource "konnect_team" "admin_team" {
 resource "konnect_team" "viewer_team" {
   for_each = toset(local.environments)
 
-  name        = "team-${local.project}-${each.key}-viewer"
+  name        = "${local.project}-${each.key}-viewer"
   description = "Read-only access for ${each.key} control plane"
 }
 
@@ -72,7 +72,7 @@ resource "konnect_team_role" "viewer_role_assignment" {
 resource "konnect_system_account" "sys_account" {
   for_each = toset(local.environments)
 
-  name        = "sys-${local.project}-${each.key}"
+  name        = "${local.project}-${each.key}"
   description = "System account for automation in ${each.key}"
   konnect_managed = false
 }

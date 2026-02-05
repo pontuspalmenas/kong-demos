@@ -3,3 +3,8 @@
 **/certs/tls.crt
 **/certs/tls.key
 **/.idea/
+**/.terraform*
+**/.terraform/
+**/*.tfvars
+**/*.tfbackend
+**/*.tfstate*
