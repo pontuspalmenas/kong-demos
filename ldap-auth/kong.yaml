@@ -1,0 +1,31 @@
+_format_version: "3.0"
+
+plugins:
+  - name: ldap-auth-advanced
+    config:
+      attribute: cn
+      base_dn: dc=example,dc=com
+      cache_ttl: 60
+      consumer_by:
+        - username
+        - custom_id
+      consumer_optional: false
+      group_member_attribute: memberOf
+      header_type: ldap
+      hide_credentials: false
+      keepalive: 60000
+      ldap_host: openldap
+      ldap_port: 389
+      ldaps: false
+      log_search_results: false
+      start_tls: false
+      timeout: 10000
+      verify_ldap_host: false    
+
+services:
+  - name: httpbin
+    url: https://httpbin.konghq.com
+    routes:
+      - name: httpbin
+        paths:
+          - /httpbin
