@@ -1,5 +1,11 @@
 _format_version: "3.0"
 
+consumers:
+  - custom_id: demo-user-123
+    username: demo
+    tags:
+    - demo-users
+
 plugins:
   - name: ldap-auth-advanced
     config:
