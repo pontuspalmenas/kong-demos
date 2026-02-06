@@ -1,0 +1,42 @@
+{
+  "realm": "mcp-realm",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "mcp-client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "mcp-client-secret-123",
+      "redirectUris": ["*"],
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true
+    }
+  ],
+  "users": [
+    {
+      "username": "mcp-user",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "mcp-password", "temporary": false }]
+    }
+  ],
+  "components": {
+    "org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy": [
+      {
+        "name": "Allowed Client Scopes",
+        "providerId": "allowed-client-templates",
+        "subType": "anonymous",
+        "config": {
+          "allow-default-scopes": [ "true" ]
+        }
+      },
+      {
+        "name": "Max Clients Policy",
+        "providerId": "max-clients",
+        "subType": "anonymous",
+        "config": {
+          "max-clients": [ "200" ]
+        }
+      }
+    ]
+  }
+}

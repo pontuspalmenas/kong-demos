@@ -1,0 +1,23 @@
+{
+  "location": {
+    "name": "Stockholm",
+    "country": "SE",
+    "lat": 59.3293,
+    "lon": 18.0686,
+    "timezone": "Europe/Stockholm",
+    "elevation_m": 28
+  },
+  "generated_at": "2026-01-19T12:00:00+01:00",
+  "daily": [
+    {
+      "date": "2026-01-20",
+      "summary": "Overcast, light snow developing late",
+      "temp": { "min": -6.0, "max": -1.0, "feels_like_min": -10.0, "feels_like_max": -5.0 },
+      "humidity_pct": 86,
+      "pressure_hpa": 1006,
+      "cloud_cover_pct": 96,
+      "uv_index": 0,
+      "sun": { "sunrise": "2026-01-20T08:41:00+01:00", "sunset": "2026-01-20T15:25:00+01:00" }
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+version: "3"
+
+dotenv: [ '.env' ]
+
+tasks:
+  deck-sync:
+    cmds:
+      # Force load .env so we don't accidentally sync to some other KONNECT_CONTROL_PLANE_NAME explicitly set in the shell
+      - |
+        set -a
+        source .env
+        set +a 
+        deck gateway sync kong.yaml --konnect-token $KONNECT_TOKEN --konnect-control-plane-name $KONNECT_CONTROL_PLANE_NAME --konnect-addr https://eu.api.konghq.com
+
+  deck-diff:
+    cmds:
+      # Force load .env so we don't accidentally sync to some other KONNECT_CONTROL_PLANE_NAME explicitly set in the shell
+      - |
+        set -a
+        source .env
+        set +a        
+        deck gateway diff kong.yaml --konnect-token $KONNECT_TOKEN --konnect-control-plane-name $KONNECT_CONTROL_PLANE_NAME --konnect-addr https://eu.api.konghq.com
+
+  deck-reset:
+    cmds:
+      # Force load .env so we don't accidentally sync to some other KONNECT_CONTROL_PLANE_NAME explicitly set in the shell
+      - |
+        set -a
+        source .env
+        set +a        
+        deck gateway reset --konnect-token $KONNECT_TOKEN --konnect-control-plane-name $KONNECT_CONTROL_PLANE_NAME --konnect-addr https://eu.api.konghq.com
+
+  build-all:
+    vars:
+      DIRS:
+        sh: find mcp-servers/ -maxdepth 1 -mindepth 1 -type d
+    cmds:
+      - for: { var: DIRS }
+        task: build-dir
+        vars: { DIR: '{{.ITEM}}' }
+
+  build-dir:
+    internal: true
+    cmds:
+      - echo "Building Docker image for {{.DIR}}..."
+      - |
+        docker buildx build \
+          --no-cache \
+          {{.DIR}}        

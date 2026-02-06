@@ -1,0 +1,85 @@
+services:
+  kong:
+    image: "${KONG_TAG:-kong/kong-gateway:latest}"
+    container_name: "kong"
+    restart: always
+    environment:
+      KONG_ROLE: "data_plane"
+      KONG_DATABASE: "off"
+      KONG_VITALS: "off"
+      KONG_CLUSTER_MTLS: "pki"
+      KONG_CLUSTER_CONTROL_PLANE: "${KONG_CLUSTER_PREFIX}.eu.cp0.konghq.com:443"
+      KONG_CLUSTER_SERVER_NAME: "${KONG_CLUSTER_PREFIX}.eu.cp0.konghq.com"
+      KONG_CLUSTER_TELEMETRY_ENDPOINT: "${KONG_CLUSTER_PREFIX}.eu.tp0.konghq.com:443"
+      KONG_CLUSTER_TELEMETRY_SERVER_NAME: "${KONG_CLUSTER_PREFIX}.eu.tp0.konghq.com"
+      KONG_CLUSTER_CERT: "/etc/kong/certs/tls.crt"
+      KONG_CLUSTER_CERT_KEY: "/etc/kong/certs/tls.key"
+      KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
+      KONG_KONNECT_MODE: "on"
+      KONG_ROUTER_FLAVOR: "expressions"
+      KONG_LOG_LEVEL: "debug"
+      KONG_TRACING_INSTRUMENTATIONS: "all"
+      KONG_TRACING_SAMPLING_RATE: "1.0"
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+    volumes:
+      - ./certs:/etc/kong/certs:ro
+    networks:
+      - kong-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  mcp-dice-roller:
+    container_name: "mcp-dice-roller"
+    build: mcp-servers/dice-roller
+    ports:
+      - "3001:3001"
+    networks:
+      - kong-net
+
+  mcp-weather-info:
+    container_name: "mcp-weather-info"
+    build: mcp-servers/weather-info
+    ports:
+      - "3002:3002"
+    networks:
+      - kong-net
+
+  keycloak:
+      image: quay.io/keycloak/keycloak:latest
+      container_name: keycloak
+      command: start-dev --import-realm
+      environment:
+        KC_BOOTSTRAP_ADMIN_USERNAME: admin
+        KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+        KC_DB: postgres
+        KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+        KC_DB_USERNAME: keycloak
+        KC_DB_PASSWORD: password
+      ports:
+        - "8180:8080"
+      volumes:
+        - ./realm-export.json:/opt/keycloak/data/import/realm.json:ro
+      depends_on:
+        - keycloak-db
+      networks:
+        - kong-net
+
+  keycloak-db:
+    image: postgres:latest
+    container_name: keycloak-db
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+    networks:
+      - kong-net
+
+volumes:
+  cache:
+    driver: local
+
+networks:
+  kong-net:
+    driver: bridge

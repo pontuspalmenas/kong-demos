@@ -1,0 +1,47 @@
+_format_version: "3.0"
+
+services:
+  - name: mcp-dice-roller
+    url: http://mcp-dice-roller:3001/mcp
+    routes:
+      - name: mcp-dice-roller
+        paths:
+          - /mcp/dice
+        plugins:
+          - name: ai-mcp-proxy
+            instance_name: dice-roller-mcp-proxy
+            config:
+              mode: passthrough-listener
+              max_request_body_size: 1048576
+            tags:
+              - mcp
+  - name: mcp-weather-info
+    url: http://mcp-weather-info:3002
+    routes:
+      - name: mcp-weather-info
+        paths:
+          - /mcp/weather
+          - /.well-known/oauth-protected-resource/mcp-weather
+        plugins:
+          - name: ai-mcp-oauth2
+            instance_name: weather-info-mcp-oauth2
+            config:
+              authorization_servers:
+                - http://localhost:8180/realms/mcp-realm
+              cache_introspection: true
+              client_id: mcp-client
+              client_secret: mcp-client-secret-123
+              insecure_relaxed_audience_validation: true
+              introspection_endpoint: http://keycloak:8180/realms/mcp-realm/protocol/openid-connect/token/introspect
+              metadata_endpoint: /.well-known/oauth-protected-resource/mcp-weather
+              resource: http://localhost:8000/mcp/weather
+            enabled: true
+            tags:
+              - mcp
+          - name: ai-mcp-proxy
+            instance_name: weather-info-mcp-proxy
+            config:
+              mode: passthrough-listener
+              max_request_body_size: 1048576
+            tags:
+              - mcp

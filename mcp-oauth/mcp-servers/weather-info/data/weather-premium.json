@@ -1,0 +1,63 @@
+{
+  "location": {
+    "name": "Stockholm",
+    "country": "SE",
+    "lat": 59.3293,
+    "lon": 18.0686,
+    "timezone": "Europe/Stockholm",
+    "elevation_m": 28
+  },
+  "generated_at": "2026-01-19T12:00:00+01:00",
+  "daily": [
+    {
+      "date": "2026-01-20",
+      "summary": "Overcast, light snow developing late",
+      "temp": { "min": -6.0, "max": -1.0, "feels_like_min": -10.0, "feels_like_max": -5.0 },
+      "humidity_pct": 86,
+      "pressure_hpa": 1006,
+      "cloud_cover_pct": 96,
+      "uv_index": 0,
+      "sun": { "sunrise": "2026-01-20T08:41:00+01:00", "sunset": "2026-01-20T15:25:00+01:00" }
+    },
+    {
+      "date": "2026-01-21",
+      "summary": "Snow showers, breezy",
+      "temp": { "min": -5.0, "max": 0.0, "feels_like_min": -9.0, "feels_like_max": -4.0 },
+      "humidity_pct": 81,
+      "pressure_hpa": 999,
+      "cloud_cover_pct": 88,
+      "uv_index": 0,
+      "sun": { "sunrise": "2026-01-21T08:40:00+01:00", "sunset": "2026-01-21T15:27:00+01:00" }
+    },
+    {
+      "date": "2026-01-22",
+      "summary": "Clearing skies, cold",
+      "temp": { "min": -9.0, "max": -3.0, "feels_like_min": -14.0, "feels_like_max": -8.0 },
+      "humidity_pct": 73,
+      "pressure_hpa": 1013,
+      "cloud_cover_pct": 35,
+      "uv_index": 1,
+      "sun": { "sunrise": "2026-01-22T08:39:00+01:00", "sunset": "2026-01-22T15:29:00+01:00" }
+    },
+    {
+      "date": "2026-01-23",
+      "summary": "Sunny, very cold morning; high thin clouds later",
+      "temp": { "min": -12.0, "max": -4.0, "feels_like_min": -18.0, "feels_like_max": -9.0 },
+      "humidity_pct": 68,
+      "pressure_hpa": 1022,
+      "cloud_cover_pct": 22,
+      "uv_index": 1,
+      "sun": { "sunrise": "2026-01-23T08:37:00+01:00", "sunset": "2026-01-23T15:31:00+01:00" }
+    },
+    {
+      "date": "2026-01-24",
+      "summary": "Cloudy with a chance of light snow",
+      "temp": { "min": -8.0, "max": -2.0, "feels_like_min": -12.0, "feels_like_max": -6.0 },
+      "humidity_pct": 79,
+      "pressure_hpa": 1011,
+      "cloud_cover_pct": 80,
+      "uv_index": 0,
+      "sun": { "sunrise": "2026-01-24T08:36:00+01:00", "sunset": "2026-01-24T15:33:00+01:00" }
+    }
+  ]
+}
