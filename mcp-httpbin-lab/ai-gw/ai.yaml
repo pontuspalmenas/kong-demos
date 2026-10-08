@@ -1,0 +1,48 @@
+_format_version: "3.0"
+services:
+  # In conversion-listener mode the MCP endpoint and the REST upstream share ONE Route:
+  # tool calls re-enter this Route and are proxied to this Service. So the Service must
+  # be the real upstream (the API GW DP), not a dummy.
+  # preserve_host keeps each tool's Host (httpbin.example) so the API GW routes on it.
+  - name: api-gw
+    url: http://kong-api-gw:8000
+    routes:
+      - name: mcp-route
+        protocols: [http]
+        paths: [/mcp]
+        methods: [GET, POST, DELETE]
+        preserve_host: true
+        strip_path: false
+        plugins:
+          - name: ai-mcp-proxy
+            config:
+              mode: conversion-listener
+              tools:
+                - name: httpbin_get
+                  description: "Echo a GET request (query params) via httpbin."
+                  host: httpbin.example
+                  scheme: http
+                  path: /get
+                  method: GET
+                  parameters:
+                    - name: msg
+                      in: query
+                      required: false
+                      schema: {type: string, description: "Any text to echo back"}
+                - name: httpbin_uuid
+                  description: "Return a random UUID4 from httpbin."
+                  host: httpbin.example
+                  scheme: http
+                  path: /uuid
+                  method: GET
+                - name: httpbin_status
+                  description: "Return the given HTTP status code from httpbin."
+                  host: httpbin.example
+                  scheme: http
+                  path: /status/{code}
+                  method: GET
+                  parameters:
+                    - name: code
+                      in: path
+                      required: true
+                      schema: {type: integer, description: "HTTP status code, e.g. 200"}

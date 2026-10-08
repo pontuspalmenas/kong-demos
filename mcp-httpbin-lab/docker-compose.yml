@@ -1,0 +1,37 @@
+services:
+  httpbin:
+    image: kennethreitz/httpbin
+    networks: [lab]
+
+  kong-api-gw:
+    # Separate DP: Kong Gateway EE, DB-less, fronts httpbin
+    image: kong/kong-gateway:3.14
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /kong/api.yaml
+      KONG_PROXY_LISTEN: "0.0.0.0:8000"
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001"
+      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA:?set in .env}
+    volumes:
+      - ./api-gw/api.yaml:/kong/api.yaml:ro
+    ports: ["18000:8000", "18001:8001"]
+    depends_on: [httpbin]
+    networks: [lab]
+
+  kong-ai-gw:
+    # AI Gateway 2.2, DB-less, exposes /mcp
+    image: kong/kong-ai-gateway:2.2.0
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /kong/ai.yaml
+      KONG_PROXY_LISTEN: "0.0.0.0:8000"
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001"
+      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA:?set in .env}
+    volumes:
+      - ./ai-gw/ai.yaml:/kong/ai.yaml:ro
+    ports: ["18010:8000", "18011:8001"]
+    depends_on: [kong-api-gw]
+    networks: [lab]
+
+networks:
+  lab: {}
